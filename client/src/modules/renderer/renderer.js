@@ -1,5 +1,6 @@
 import MAIN from '../../index.js';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
+import Test from '../game/objects/plants/flowers/lib/Test';
 let THREE;
 export default {
     init(startRender){
@@ -26,6 +27,9 @@ export default {
         window.addEventListener("resize", ()=>{this.setSize()});
         this.setSize();
         renderer.setClearColor(new THREE.Color(0x8dd8e0));
+
+        const test = new Test();
+        scene.add(test.mesh);
         
         if(startRender) this.render();
     },
