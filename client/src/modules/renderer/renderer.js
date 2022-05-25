@@ -28,8 +28,9 @@ export default {
         this.setSize();
         renderer.setClearColor(new THREE.Color(0x8dd8e0));
 
-        const test = new Test();
+        const test = new Test(false,[0,0,0]);
         scene.add(test.mesh);
+        test.grow();
         
         if(startRender) this.render();
     },
