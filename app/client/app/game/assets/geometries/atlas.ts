@@ -6,6 +6,11 @@ const geometriesAtlas: AtlasItem[] = [
         folder: '',
         file: 'ground.glb',
     },
+    {
+        name: 'grass',
+        folder: '',
+        file: 'grass.glb',
+    },
 ];
 
 export { geometriesAtlas };

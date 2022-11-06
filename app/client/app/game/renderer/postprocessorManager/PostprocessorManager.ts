@@ -43,7 +43,7 @@ export default class PostprocessorManager {
 
             this.passes.cartoonOutline = new CartoonOutline(
                 {
-                    color: new Color(0x303030),
+                    color: new Color(0x101010),
                     size: 1,
                     difference: 2000,
                 },
