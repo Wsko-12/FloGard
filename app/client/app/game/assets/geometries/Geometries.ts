@@ -25,5 +25,9 @@ class Geometries {
             load();
         });
     };
+
+    static get(name: string) {
+        return this.loaded[name];
+    }
 }
 export default Geometries;

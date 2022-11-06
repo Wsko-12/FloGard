@@ -16,8 +16,6 @@ export default class Day {
         this.time += 1;
         this.time = this.time % this.fullDay;
         this.callSubscribers();
-
-        console.log(this.getTimeHM().join(':'));
     };
 
     static getTimeHM = () => {

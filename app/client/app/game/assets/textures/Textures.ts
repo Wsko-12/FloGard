@@ -1,4 +1,4 @@
-import { Texture, TextureLoader } from 'three';
+import { NearestFilter, Texture, TextureLoader } from 'three';
 import { textureAtlas } from './atlas';
 class Textures {
     static loaded: Record<string, Texture> = {};
@@ -16,6 +16,7 @@ class Textures {
                 const path = './assets/textures/' + data.folder + '/' + data.file;
                 loader.load(path, (texture) => {
                     texture.flipY = false;
+                    texture.magFilter = NearestFilter;
                     this.loaded[data.name] = texture;
                     load();
                 });

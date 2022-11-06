@@ -28,10 +28,10 @@ export default class OrbitController extends CameraController {
     };
 
     private blockRect = {
-        x: -10,
-        y: -10,
-        width: 20,
-        height: 20,
+        x: -5,
+        y: -5,
+        width: 10,
+        height: 10,
     };
 
     private camera: PerspectiveCamera;

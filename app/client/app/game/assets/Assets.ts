@@ -13,6 +13,9 @@ class Assets {
     static getTexture(name: string) {
         return Textures.get(name);
     }
+    static getGeometry(name: string) {
+        return Geometries.get(name);
+    }
 }
 
 export default Assets;

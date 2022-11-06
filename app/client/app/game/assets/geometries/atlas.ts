@@ -2,9 +2,9 @@ import { AtlasItem } from '../../../../../ts/interfaces';
 
 const geometriesAtlas: AtlasItem[] = [
     {
-        name: 'polygon',
+        name: 'ground',
         folder: '',
-        file: 'polygon.glb',
+        file: 'ground.glb',
     },
 ];
 

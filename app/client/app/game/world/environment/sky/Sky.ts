@@ -29,7 +29,7 @@ export default class Sky {
         this.color = new Color(0x000000);
         const scene = World.getScene();
         scene.background = this.color;
-        const geometry = new SphereBufferGeometry(15, 10, 5);
+        const geometry = new SphereBufferGeometry(25, 10, 5);
         const texture = Assets.getTexture('sceneEnvMap');
         const material = new MeshBasicMaterial({
             map: texture,

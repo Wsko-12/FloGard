@@ -6,6 +6,11 @@ const textureAtlas: AtlasItem[] = [
         folder: '',
         file: 'sceneEnvMap.png',
     },
+    {
+        name: 'ground',
+        folder: '',
+        file: 'ground.png',
+    },
 ];
 
 export { textureAtlas };
