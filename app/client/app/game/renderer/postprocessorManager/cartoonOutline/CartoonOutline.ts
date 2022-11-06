@@ -80,9 +80,10 @@ export default class CartoonOutline implements Pass {
                     return viewZToOrthographicDepth( viewZ, 0.1, 20.0 );
                 }
                 void main() {
+                    float distance = 0.8;
                     vec4 texture = texture2D( tDiffuse, vUv );
                     float depth = 1.0 - readDepth( tDepth, vUv );
-                    // vec3 depthColor = vec3(depth);
+                    vec3 depthColor = vec3(depth);
                     float shift_x = (1.0/(resolution.x*0.5)*0.5) * outlineSize;
                     float shift_y = (1.0/(resolution.y*0.5)*0.5) * outlineSize;
                     float depth_top = 1.0 - readDepth(tDepth, vec2(vUv.x,vUv.y+shift_y));
@@ -91,8 +92,16 @@ export default class CartoonOutline implements Pass {
                     float depth_right = 1.0 - readDepth(tDepth, vec2(vUv.x+shift_x,vUv.y));
                     float depth_round_average = (depth+depth_top+depth_bottom+depth_left+depth_right)*0.20;
                     float outline = abs(depth - depth_round_average);
-                    float outline_step = 1.0 - step(outline,1.0/outlineDifference);
-                    gl_FragColor = vec4(mix(texture.rgb,outlineColor, outline_step),1.0);
+                    float full_outline = 1.0 - step(outline,1.0/outlineDifference);
+
+                    // before
+                    // float outline_step = 1.0 - step(outline,1.0/outlineDifference);
+                    // gl_FragColor = vec4(mix(texture.rgb,outlineColor, outline_step),1.0);
+
+                    float outline_mask = (max(depth_round_average, 0.6) - 0.6) * 2.5;
+                    float draw_outline = mix(0.0, full_outline, outline_mask);
+                    gl_FragColor = vec4(mix(texture.rgb,outlineColor, draw_outline),1.0);
+
                 }`,
         });
 

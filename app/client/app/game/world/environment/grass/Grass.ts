@@ -16,7 +16,7 @@ export class Grass {
         this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
         LoopsManager.subscribe('update', this.update);
-        this.mesh.position.y = -0.08;
+        // this.mesh.position.y = -0.2;
     }
 
     private update = (time: number) => {
