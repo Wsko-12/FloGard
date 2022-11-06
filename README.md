@@ -1,8 +1,2 @@
-# webpack-three-mobile
-
-Utils:
-* MergedObject: https://wsko-12.github.io/webpack-three-mobile/MergedObject/  
-
-
-Postprocessors:
-* Cartoon outline: https://wsko-12.github.io/webpack-three-mobile/CartoonOutline/
+# game-start-pack
+Camera orbit controller: https://wsko-12.github.io/game-start-pack/camera-orbit-controller/

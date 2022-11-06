@@ -1,51 +1,82 @@
 const path = require('path');
-const CopyPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 
-module.exports = {
-  entry: {
-    index: '/client/src/index.js',
-  },
-  mode:'development',
-  output: {
-    filename: 'main.js',
-    path: path.resolve(__dirname, './client/dist'),
-  },
-  plugins: [
-    new CopyPlugin({
-        patterns: [
-            { from: path.resolve(__dirname, './client/src/assets'), to: path.resolve(__dirname, './client/dist/assets') },
-        ],
-    }),
-    new HtmlWebpackPlugin({
-      template:path.resolve(__dirname, './client/src/index.html'),
-      chunks: ['index'],
-      scriptLoading: 'module',
-      // minify:{
-      //   collapseWhitespace: true,
-      //   keepClosingSlash: true,
-      //   removeComments: true,
-      //   removeRedundantAttributes: true,
-      //   removeScriptTypeAttributes: true,
-      //   removeStyleLinkTypeAttributes: true,
-      //   useShortDoctype: true
-      // }
-    }),
-  ],
-  module:{
-    rules:[
-      {
-        test: /\.s[ac]ss$/i,
-        use: [
-          // Creates `style` nodes from JS strings
-          "style-loader",
-          // Translates CSS into CommonJS
-          "css-loader",
-          // Compiles Sass to CSS
-          "sass-loader",
+
+const base = {
+    mode:'development',
+    
+    module: {
+        rules: [
+          {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/,
+          },
+          {
+            test: /\.s[ac]ss$/i,
+            use: [
+              "style-loader",
+              "css-loader",
+              'sass-loader',
+              {
+                loader: 'sass-resources-loader',
+                options: {
+                  resources: ['./app/client/app/mixins.scss']
+                },
+              },
+            ],
+          },
         ],
       },
-    ]
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js', 'css', 'scss'],
+    },
+}
+
+
+const serverConfig = {
+  target: 'node',
+  entry: path.resolve(__dirname, 'app/server/app.ts'),
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'app.js',
   },
-  experiments: { outputModule: true },
+  ...base,
 };
+
+const clientConfig = {
+  target: 'web', 
+  entry: path.resolve(__dirname, 'app/client/index.ts'),
+  output: {
+    path: path.resolve(__dirname, 'dist/client'),
+    filename: 'index[hash].js',
+  },
+  plugins: [ 
+    new CopyPlugin({
+      patterns:[{
+        from: path.resolve(__dirname, 'app/client/app/game/assets/textures/src'),
+        to: path.resolve(__dirname, 'dist/client/assets/textures'),
+      },
+      {
+        from: path.resolve(__dirname, 'app/client/app/game/assets/images/src'),
+        to: path.resolve(__dirname, 'dist/client/assets/images'),
+      },
+      {
+        from: path.resolve(__dirname, 'app/client/app/game/assets/geometries/src'),
+        to: path.resolve(__dirname, 'dist/client/assets/geometries'),
+      }
+    ]
+    }),
+    new HtmlWebpackPlugin({
+      template: 'app/client/index.html'
+    }),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns:["**/*","!assets"],
+    }),
+  ],
+  ...base,
+};
+
+module.exports = [serverConfig, clientConfig];

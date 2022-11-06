@@ -1,30 +1,50 @@
 {
   "name": "FloGard",
   "version": "1.0.0",
-  "description": "Garden Game",
-  "private": true,
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "dev": "webpack --watch"
+    "test": "jest --verbose",
+    "build": "webpack",
+    "dev": "webpack serve --open"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Wsko-12/webpack-basic.git"
+    "url": "git+https://github.com/Wsko-12/flo-garden.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Wsko-12/webpack-basic/issues"
+    "url": "https://github.com/Wsko-12/flo-garden/issues"
   },
-  "homepage": "https://github.com/Wsko-12/webpack-basic#readme",
+  "homepage": "https://github.com/Wsko-12/flo-garden#readme",
   "devDependencies": {
-    "copy-webpack-plugin": "^10.2.4",
+    "@types/jest": "^28.1.5",
+    "@types/node": "^18.0.0",
+    "@types/three": "^0.141.0",
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
+    "@typescript-eslint/parser": "^5.30.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
+    "eslint": "^8.18.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "html-webpack-plugin": "^5.5.0",
-    "sass": "^1.51.0",
-    "sass-loader": "^12.6.0",
+    "jest": "^28.1.3",
+    "prettier": "^2.7.1",
+    "sass": "^1.53.0",
+    "sass-loader": "^13.0.2",
+    "sass-resources-loader": "^2.2.5",
     "style-loader": "^3.3.1",
-    "three": "^0.140.2",
-    "webpack": "^5.72.0",
-    "webpack-cli": "^4.9.2"
+    "three": "^0.142.0",
+    "ts-jest": "^28.0.6",
+    "ts-loader": "^9.3.1",
+    "typescript": "^4.7.4",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.9.3"
   }
 }

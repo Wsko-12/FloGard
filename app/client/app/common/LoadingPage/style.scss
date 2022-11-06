@@ -1,0 +1,23 @@
+$overlay-color: rgba($color: #303030, $alpha: 0.5);
+$progress-overlay-color: rgba($color: #303030, $alpha: 0.8);
+$progress-color: #ffffff;
+.loading__overlay{
+    width: 100vw;
+    height: 100vh;
+    background-color: $overlay-color;
+    display: flex;
+    z-index: 9999;
+    position: fixed;
+}
+.loading__progress-container{
+    margin: auto;
+    width: 33vw;
+    height: 10px;
+    background-color: $progress-overlay-color;
+}
+.loading__progress{
+    width: 0px;
+    height: 100%;
+    background-color: $progress-color;
+    transition-duration: 0.2s;
+}
