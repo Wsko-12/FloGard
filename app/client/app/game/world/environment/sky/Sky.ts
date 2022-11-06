@@ -6,6 +6,7 @@ import {
     Mesh,
     MeshBasicMaterial,
     MultiplyBlending,
+    RepeatWrapping,
     SphereBufferGeometry,
 } from 'three';
 import { RGBArr } from '../../../../../../ts/types';
@@ -32,9 +33,11 @@ const getSkyColorByTimeMemoized = memoize((time: number) => {
 });
 
 export default class Sky {
-    mesh: Group;
-    color: Color;
-    light: AmbientLight;
+    private mesh: Group;
+    private color: Color;
+    private starBox: Mesh;
+    private skyBox: Mesh;
+    private light: AmbientLight;
     constructor() {
         const color = new Color(0x000000);
         this.color = color;
@@ -47,16 +50,33 @@ export default class Sky {
             opacity: 0.5,
             transparent: true,
             blending: MultiplyBlending,
+            side: BackSide,
         });
-        material.side = BackSide;
         this.mesh = new Group();
 
+        const starsTexture = Assets.getTexture('stars');
+        starsTexture.wrapS = starsTexture.wrapT = RepeatWrapping;
+        starsTexture.repeat.x = 10;
+        starsTexture.repeat.y = 5;
+
+        const starsMaterial = new MeshBasicMaterial({
+            map: starsTexture,
+            side: BackSide,
+            alphaTest: 0.2,
+            transparent: true,
+            opacity: 1,
+        });
+
         const skyBox = new Mesh(geometry, material);
+        const starBox = new Mesh(geometry, starsMaterial);
+
         const light = new AmbientLight(0xffffff, 0.4);
 
         this.light = light;
+        this.starBox = starBox;
+        this.skyBox = skyBox;
 
-        this.mesh.add(skyBox, light);
+        this.mesh.add(skyBox, light, starBox);
 
         Day.subscribe(this.update);
     }
@@ -68,5 +88,7 @@ export default class Sky {
     update: TDayCallback = (time) => {
         const color = getSkyColorByTimeMemoized(time);
         this.color.set(color);
+        const opacity = Math.abs(0.5 - time / FULL_DAY_TIME) * 2;
+        (this.starBox.material as MeshBasicMaterial).opacity = opacity;
     };
 }
