@@ -1,4 +1,5 @@
 import { Scene } from 'three';
+import Day from './day/Day';
 import Environment from './environment/Environment';
 
 export default class World {
@@ -7,6 +8,7 @@ export default class World {
         const scene = new Scene();
         this.scene = scene;
 
+        Day.init();
         Environment.init();
     }
 

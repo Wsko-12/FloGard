@@ -1,6 +1,6 @@
 import Loop, { TLoopCallback } from './loop/Loop';
 
-export type TGameLoopName = 'render' | 'update';
+export type TGameLoopName = 'render' | 'update' | 'tick';
 
 export default class LoopsManager {
     private static loops: Record<TGameLoopName, Loop> | null = null;
@@ -12,6 +12,7 @@ export default class LoopsManager {
         this.loops = {
             render: new Loop(60),
             update: new Loop(45),
+            tick: new Loop(2),
         };
         this.setDevFunctions();
     }
@@ -48,8 +49,9 @@ export default class LoopsManager {
         const delta = (now - this.timestamp) * 0.001;
         this.timestamp = now;
 
-        this.loops.render.play(delta);
-        this.loops.update.play(delta);
+        Object.values(this.loops).forEach((loop) => {
+            loop.play(delta);
+        });
 
         if (!this.paused) {
             requestAnimationFrame(this.play);
@@ -76,18 +78,18 @@ export default class LoopsManager {
             pauseUpdate: (value: boolean) => {
                 this.loops?.update.pause(value);
             },
-            // pauseTick: (value: boolean) => {
-            //     this.loops?.tick.switcher(!value);
-            // },
+            pauseTick: (value: boolean) => {
+                this.loops?.tick.pause(value);
+            },
             setRenderFPS: (fps: number) => {
                 this.loops?.render.setFps(fps);
             },
             setUpdateFPS: (fps: number) => {
                 this.loops?.update.setFps(fps);
             },
-            // setTickFPS: (fps: number) => {
-            //     this._loops.tick.setFps(fps);
-            // },
+            setTickFPS: (fps: number) => {
+                this.loops?.tick.setFps(fps);
+            },
         };
     }
 }
