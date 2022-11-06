@@ -9,6 +9,10 @@ class Assets {
         await Geometries.load();
         return true;
     };
+
+    static getTexture(name: string) {
+        return Textures.get(name);
+    }
 }
 
 export default Assets;

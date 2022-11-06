@@ -2,9 +2,9 @@ import { AtlasItem } from '../../../../../ts/interfaces';
 
 const textureAtlas: AtlasItem[] = [
     {
-        name: 'test',
+        name: 'sceneEnvMap',
         folder: '',
-        file: 'test.png',
+        file: 'sceneEnvMap.png',
     },
 ];
 
