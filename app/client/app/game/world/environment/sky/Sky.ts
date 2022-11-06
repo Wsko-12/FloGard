@@ -19,11 +19,11 @@ const skyColors: RGBArr[] = [
     [17, 34, 82],
     [17, 34, 82],
     [255, 160, 222],
-    [255, 237, 211],
-    [215, 255, 255],
+    [171, 214, 214],
+    [171, 214, 214],
 
-    [215, 255, 255],
-    [215, 255, 255],
+    [171, 214, 214],
+    [171, 214, 214],
     [255, 68, 68],
     [8, 15, 34],
 ];
@@ -47,9 +47,8 @@ export default class Sky {
         const texture = Assets.getTexture('sceneEnvMap');
         const material = new MeshBasicMaterial({
             map: texture,
-            opacity: 0.5,
+            opacity: 0.8,
             transparent: true,
-            blending: MultiplyBlending,
             side: BackSide,
         });
         this.mesh = new Group();
@@ -70,7 +69,7 @@ export default class Sky {
         const skyBox = new Mesh(geometry, material);
         const starBox = new Mesh(geometry, starsMaterial);
 
-        const light = new AmbientLight(0xffffff, 0.4);
+        const light = new AmbientLight(0xffffff, 0.65);
 
         this.light = light;
         this.starBox = starBox;

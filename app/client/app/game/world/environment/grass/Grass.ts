@@ -1,4 +1,4 @@
-import { BufferGeometry, Mesh, MeshToonMaterial } from 'three';
+import { BufferGeometry, DoubleSide, Mesh, MeshToonMaterial, NearestFilter } from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import Assets from '../../../assets/Assets';
 import LoopsManager from '../../../loopsManager/LoopsManager';
@@ -16,7 +16,7 @@ export class Grass {
         this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
         LoopsManager.subscribe('update', this.update);
-        // this.mesh.position.y = -0.08;
+        this.mesh.position.y = -0.08;
     }
 
     private update = (time: number) => {
@@ -26,11 +26,13 @@ export class Grass {
     private createMesh() {
         const grassGeometry = Assets.getGeometry('grass');
         const texture = Assets.getTexture('grass');
+        texture.minFilter = NearestFilter;
 
         const material = new MeshToonMaterial({
-            color: 0x415933,
+            color: 0x37452e,
             alphaMap: texture,
             alphaTest: 0.01,
+            side: DoubleSide,
         });
 
         material.onBeforeCompile = (shader) => {

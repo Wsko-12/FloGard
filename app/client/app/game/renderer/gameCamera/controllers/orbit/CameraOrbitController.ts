@@ -17,7 +17,7 @@ export default class OrbitController extends CameraController {
         deltaTetha: 0,
         blockTetha: {
             min: (Math.PI / 180) * 10,
-            max: Math.PI / 2 - (Math.PI / 180) * 10,
+            max: Math.PI / 2 - (Math.PI / 180) * 45,
         },
     };
     public zoom = {
