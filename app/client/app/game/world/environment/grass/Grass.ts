@@ -56,12 +56,13 @@ export class Grass {
         for (let x = 0; x < 5; x++) {
             for (let y = 0; y < 5; y++) {
                 const geometry = grassGeometry.clone();
-                const shiftX = x * 1.85 - 3.7;
-                const shiftZ = y * 1.85 - 3.7;
+                const shiftX = x * 2 - 4;
+                const shiftZ = y * 2 - 4;
+
+                const angle = Math.floor(Math.random() * 4);
+                geometry.rotateY(Math.PI * angle);
+
                 geometry.translate(shiftX, 0, shiftZ);
-                if (Math.random() > 0.5) {
-                    geometry.rotateY(Math.PI * 2);
-                }
                 geometries.push(geometry);
             }
         }

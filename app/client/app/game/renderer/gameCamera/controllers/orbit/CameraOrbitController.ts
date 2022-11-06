@@ -21,7 +21,7 @@ export default class OrbitController extends CameraController {
         },
     };
     public zoom = {
-        value: 1,
+        value: 9,
         max: 10,
         min: 0.5,
         delta: 0,
