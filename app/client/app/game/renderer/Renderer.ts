@@ -1,4 +1,4 @@
-import { WebGLRenderer } from 'three';
+import { VSMShadowMap, WebGLRenderer } from 'three';
 import LoopsManager from '../loopsManager/LoopsManager';
 import GameUI from '../ui/GameUI';
 import World from '../world/World';
@@ -21,6 +21,8 @@ export default class Renderer {
         this.renderer = renderer;
 
         renderer.setClearColor(0x00ffff);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = VSMShadowMap;
 
         window.addEventListener('resize', this.setSize);
         this.setSize();

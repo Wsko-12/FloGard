@@ -1,4 +1,4 @@
-import { DoubleSide, Mesh, MeshBasicMaterial } from 'three';
+import { DoubleSide, Mesh, MeshToonMaterial } from 'three';
 import Assets from '../../../assets/Assets';
 
 export default class Ground {
@@ -6,8 +6,9 @@ export default class Ground {
     constructor() {
         const geometry = Assets.getGeometry('ground');
         const texture = Assets.getTexture('ground');
-        const material = new MeshBasicMaterial({ map: texture, alphaTest: 0.5, side: DoubleSide });
+        const material = new MeshToonMaterial({ map: texture, alphaTest: 0.5, side: DoubleSide });
         const mesh = new Mesh(geometry, material);
+        mesh.receiveShadow = true;
         this.mesh = mesh;
     }
 

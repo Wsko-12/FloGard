@@ -1,4 +1,4 @@
-import { BufferGeometry, Mesh, MeshBasicMaterial } from 'three';
+import { BufferGeometry, Mesh, MeshToonMaterial } from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import Assets from '../../../assets/Assets';
 import LoopsManager from '../../../loopsManager/LoopsManager';
@@ -13,7 +13,10 @@ export class Grass {
 
     constructor() {
         this.mesh = this.createMesh();
+        this.mesh.castShadow = true;
+        this.mesh.receiveShadow = true;
         LoopsManager.subscribe('update', this.update);
+        // this.mesh.position.y = -0.08;
     }
 
     private update = (time: number) => {
@@ -24,7 +27,7 @@ export class Grass {
         const grassGeometry = Assets.getGeometry('grass');
         const texture = Assets.getTexture('grass');
 
-        const material = new MeshBasicMaterial({
+        const material = new MeshToonMaterial({
             color: 0x415933,
             alphaMap: texture,
             alphaTest: 0.01,

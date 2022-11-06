@@ -1,6 +1,15 @@
-import { BackSide, Color, Mesh, MeshBasicMaterial, SphereBufferGeometry } from 'three';
+import {
+    AmbientLight,
+    BackSide,
+    Color,
+    Group,
+    Mesh,
+    MeshBasicMaterial,
+    MultiplyBlending,
+    SphereBufferGeometry,
+} from 'three';
 import { RGBArr } from '../../../../../../ts/types';
-import { getColorByDayTime, interpolateColor, memoize } from '../../../../utils/utils';
+import { getColorByDayTime, memoize } from '../../../../utils/utils';
 import Assets from '../../../assets/Assets';
 import Day, { FULL_DAY_TIME, TDayCallback } from '../../day/Day';
 import World from '../../World';
@@ -23,30 +32,40 @@ const getSkyColorByTimeMemoized = memoize((time: number) => {
 });
 
 export default class Sky {
-    mesh: Mesh;
+    mesh: Group;
     color: Color;
+    light: AmbientLight;
     constructor() {
-        this.color = new Color(0x000000);
+        const color = new Color(0x000000);
+        this.color = color;
         const scene = World.getScene();
         scene.background = this.color;
         const geometry = new SphereBufferGeometry(25, 10, 5);
         const texture = Assets.getTexture('sceneEnvMap');
         const material = new MeshBasicMaterial({
             map: texture,
-            opacity: 0.2,
+            opacity: 0.5,
             transparent: true,
+            blending: MultiplyBlending,
         });
         material.side = BackSide;
-        this.mesh = new Mesh(geometry, material);
+        this.mesh = new Group();
 
-        Day.subscribe(this.updateColor);
+        const skyBox = new Mesh(geometry, material);
+        const light = new AmbientLight(0xffffff, 0.4);
+
+        this.light = light;
+
+        this.mesh.add(skyBox, light);
+
+        Day.subscribe(this.update);
     }
 
     getMesh() {
         return this.mesh;
     }
 
-    updateColor: TDayCallback = (time) => {
+    update: TDayCallback = (time) => {
         const color = getSkyColorByTimeMemoized(time);
         this.color.set(color);
     };
