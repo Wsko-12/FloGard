@@ -5,7 +5,6 @@ import {
     Group,
     Mesh,
     MeshBasicMaterial,
-    MultiplyBlending,
     RepeatWrapping,
     SphereBufferGeometry,
 } from 'three';
@@ -47,7 +46,7 @@ export default class Sky {
         const texture = Assets.getTexture('sceneEnvMap');
         const material = new MeshBasicMaterial({
             map: texture,
-            opacity: 0.8,
+            opacity: 0.2,
             transparent: true,
             side: BackSide,
         });

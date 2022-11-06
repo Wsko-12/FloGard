@@ -1,15 +1,4 @@
-import {
-    Color,
-    DepthFormat,
-    DepthTexture,
-    NearestFilter,
-    PerspectiveCamera,
-    Scene,
-    ShaderMaterial,
-    UnsignedShortType,
-    WebGLRenderer,
-    WebGLRenderTarget,
-} from 'three';
+import { Color, PerspectiveCamera, Scene, ShaderMaterial, WebGLRenderer, WebGLRenderTarget } from 'three';
 import { FullScreenQuad, Pass } from 'three/examples/jsm/postprocessing/Pass';
 
 export default class CartoonOutline implements Pass {
@@ -80,8 +69,10 @@ export default class CartoonOutline implements Pass {
                     return viewZToOrthographicDepth( viewZ, 0.1, 20.0 );
                 }
                 void main() {
+
                     float distance = 0.8;
                     vec4 texture = texture2D( tDiffuse, vUv );
+                    
                     float depth = 1.0 - readDepth( tDepth, vUv );
                     vec3 depthColor = vec3(depth);
                     float shift_x = (1.0/(resolution.x*0.5)*0.5) * outlineSize;
