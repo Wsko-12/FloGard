@@ -29,9 +29,10 @@ export class Grass {
         texture.minFilter = NearestFilter;
 
         const material = new MeshToonMaterial({
-            color: 0x37452e,
+            color: 0x526644,
+            map: texture,
+            alphaTest: 0.5,
             alphaMap: texture,
-            alphaTest: 0.01,
             side: DoubleSide,
         });
 
