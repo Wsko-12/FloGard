@@ -1,6 +1,6 @@
 import { DoubleSide, Mesh, MeshToonMaterial } from 'three';
 import Assets from '../../../assets/Assets';
-
+export const GROUND_SIZE = 10;
 export default class Ground {
     private mesh: Mesh;
     constructor() {

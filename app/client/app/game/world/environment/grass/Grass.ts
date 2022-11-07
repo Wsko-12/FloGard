@@ -13,10 +13,13 @@ import {
     Uniform,
 } from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { Point2 } from '../../../../utils/Geometry';
 import Assets from '../../../assets/Assets';
 import { GlobalStore } from '../../../globalStore/GlobalStore';
 import LoopsManager from '../../../loopsManager/LoopsManager';
-import Day from '../../day/Day';
+import Day, { FULL_DAY_TIME } from '../../day/Day';
+import { GROUND_SIZE } from '../ground/Ground';
+import Weed from './weed/Weed';
 
 export class Grass {
     private group: Group;
@@ -38,6 +41,9 @@ export class Grass {
     };
     private grassHeightTexture: CanvasTexture;
 
+    private weeds: Weed[] = [];
+    private weedsMeshesGroup = new Group();
+
     constructor() {
         LoopsManager.subscribe('update', this.update);
         LoopsManager.subscribe('userActions', this.mowGrass);
@@ -52,10 +58,14 @@ export class Grass {
 
         this.mover = this.createMover();
         this.group = new Group();
-        this.group.add(mesh, this.mover);
+        this.group.add(mesh, this.mover, this.weedsMeshesGroup);
 
         document.addEventListener('keydown', this.keyDownListener);
         document.addEventListener('keyup', this.keyDownListener);
+
+        for (let i = 0; i < 15; i++) {
+            this.generateWeed();
+        }
     }
 
     private keyDownListener = (e: KeyboardEvent) => {
@@ -83,6 +93,9 @@ export class Grass {
 
     private dayUpdate = (time: number) => {
         this.grow(time);
+        if (time === FULL_DAY_TIME - 1) {
+            this.generateWeed();
+        }
     };
 
     private grow = (time: number) => {
@@ -105,6 +118,23 @@ export class Grass {
         mover.rotateX(-Math.PI / 2);
         mover.position.y = 0.01;
         return mover;
+    }
+
+    private generateWeed() {
+        // use load here
+        const weed = new Weed();
+        this.weeds.push(weed);
+        this.weedsMeshesGroup.add(weed.getMesh());
+    }
+
+    private removeWeeds(toRemove: number[]) {
+        this.weeds = this.weeds.filter((weed, i) => {
+            const isRemove = toRemove.includes(i);
+            if (isRemove) {
+                this.weedsMeshesGroup.remove(weed.getMesh());
+            }
+            return !isRemove;
+        });
     }
 
     private createMesh() {
@@ -219,9 +249,9 @@ export class Grass {
         const { ctx, resolution } = this.grassHeightCanvas;
         const { x, z } = GlobalStore.cameraTarget;
 
-        const canvas_x = ((x + 5) / 5) * (resolution / 2);
-        const canvas_y = ((z + 5) / 5) * (resolution / 2);
-        const radius = (this.mover.scale.x / 15) * resolution;
+        const canvas_x = ((x + GROUND_SIZE / 2) / (GROUND_SIZE / 2)) * (resolution / 2);
+        const canvas_y = ((z + GROUND_SIZE / 2) / (GROUND_SIZE / 2)) * (resolution / 2);
+        const radius = (this.mover.scale.x / (GROUND_SIZE * 1.5)) * resolution;
         ctx.save();
         ctx.fillStyle = 'black';
         ctx.beginPath();
@@ -229,6 +259,19 @@ export class Grass {
         ctx.fill();
         ctx.restore();
         this.grassHeightTexture.needsUpdate = true;
+
+        const mowPoint = new Point2(x, z);
+
+        const toRemove: number[] = [];
+        this.weeds.forEach((weed, i) => {
+            const weedPoint = weed.getPositionPoint();
+            const distance = mowPoint.getDistanceTo(weedPoint);
+            if (distance < 0.5) {
+                toRemove.push(i);
+            }
+        });
+
+        this.removeWeeds(toRemove);
     };
 
     getMesh() {
