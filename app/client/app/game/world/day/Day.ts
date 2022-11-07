@@ -5,7 +5,7 @@ export type TDayCallback = (gameTime: number) => void;
 export const FULL_DAY_TIME = 1440;
 
 export default class Day {
-    static time = 0;
+    static time = 600;
     static fullDay = FULL_DAY_TIME;
     static subscribers: TDayCallback[] = [];
     static init() {

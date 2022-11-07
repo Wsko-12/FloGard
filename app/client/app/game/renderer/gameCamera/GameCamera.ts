@@ -1,5 +1,6 @@
 import { PerspectiveCamera } from 'three';
 import { Point3 } from '../../../utils/Geometry';
+import { GlobalStore } from '../../globalStore/GlobalStore';
 import { TLoopCallback } from '../../loopsManager/loop/Loop';
 import LoopsManager from '../../loopsManager/LoopsManager';
 import CameraController from './controllers/CameraController';
@@ -34,7 +35,8 @@ export default class GameCamera {
         if (!camera || !position || !target) {
             throw new Error('[GameCamera update] first init GameCamera ');
         }
-
+        GlobalStore.cameraTarget.x = target.x;
+        GlobalStore.cameraTarget.z = target.z;
         {
             const { x, y, z } = position;
             camera.position.set(x, y, z);

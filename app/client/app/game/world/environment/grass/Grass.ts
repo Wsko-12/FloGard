@@ -2,22 +2,26 @@ import {
     BufferGeometry,
     CanvasTexture,
     DoubleSide,
+    Group,
     Mesh,
+    MeshBasicMaterial,
     MeshDepthMaterial,
     MeshPhongMaterial,
-    MeshToonMaterial,
     NearestFilter,
-    RepeatWrapping,
+    PlaneGeometry,
     RGBADepthPacking,
     Uniform,
 } from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import Assets from '../../../assets/Assets';
+import { GlobalStore } from '../../../globalStore/GlobalStore';
 import LoopsManager from '../../../loopsManager/LoopsManager';
-import { FULL_DAY_TIME } from '../../day/Day';
+import Day from '../../day/Day';
 
 export class Grass {
-    private mesh: Mesh;
+    private group: Group;
+    private mover: Mesh;
+    private moverEnabled = false;
     private uniforms = {
         uTime: {
             value: 0,
@@ -36,21 +40,35 @@ export class Grass {
 
     constructor() {
         LoopsManager.subscribe('update', this.update);
+        LoopsManager.subscribe('userActions', this.mowGrass);
+        Day.subscribe(this.dayUpdate);
 
         this.grassHeightCanvas = this.createСanvas();
         this.grassHeightTexture = new CanvasTexture(this.grassHeightCanvas.canvas);
         this.grassHeightTexture.flipY = false;
-        this.mesh = this.createMesh();
-        this.mesh.castShadow = true;
-        this.mesh.receiveShadow = true;
+        const mesh = this.createMesh();
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        this.mover = this.createMover();
+        this.group = new Group();
+        this.group.add(mesh, this.mover);
+
+        document.addEventListener('keydown', this.keyDownListener);
+        document.addEventListener('keyup', this.keyDownListener);
     }
+
+    private keyDownListener = (e: KeyboardEvent) => {
+        if (e.code === 'KeyM') this.moverEnabled = e.type === 'keydown';
+    };
 
     private createСanvas() {
         const resolution = 1024;
         const canvas = document.createElement('canvas');
         canvas.width = canvas.height = resolution;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const ctx = canvas.getContext('2d')!;
-        ctx.fillStyle = 'black';
+        ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, resolution, resolution);
 
         return { canvas, ctx, resolution };
@@ -58,17 +76,36 @@ export class Grass {
 
     private update = (time: number) => {
         this.uniforms.uTime.value = time;
+
+        const { x, z } = GlobalStore.cameraTarget;
+        this.mover.position.set(x, 0.01, z);
+    };
+
+    private dayUpdate = (time: number) => {
         this.grow(time);
     };
 
     private grow = (time: number) => {
-        if (time % 10 === 0) {
+        if (time % 180 === 0) {
             const { ctx, resolution } = this.grassHeightCanvas;
             ctx.fillStyle = 'rgba(255,255,255,0.01)';
             ctx.fillRect(0, 0, resolution, resolution);
             this.grassHeightTexture.needsUpdate = true;
         }
     };
+
+    private createMover() {
+        const mover = new Mesh(
+            new PlaneGeometry(),
+            new MeshBasicMaterial({
+                map: Assets.getTexture('grassMover'),
+                alphaTest: 0.5,
+            })
+        );
+        mover.rotateX(-Math.PI / 2);
+        mover.position.y = 0.01;
+        return mover;
+    }
 
     private createMesh() {
         const grassGeometry = Assets.getGeometry('grass');
@@ -104,8 +141,8 @@ export class Grass {
                  float x_p = vPosition.x / 10.0 + 0.5;
                  float z_p = vPosition.z / 10.0 + 0.5;
                  float height_value = texture2D(uGrassHeight, vec2(x_p, z_p)).r;
-                 vPosition.y -= 0.2;
-                 vPosition.y += height_value * 0.2;
+                 vPosition.y -= 0.175;
+                 vPosition.y += height_value * 0.175;
                  vPosition.z += sin(vPosition.y * (normal.z) * (uTime * 10.0)) * 0.05 ;
                  gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
                 `
@@ -160,21 +197,41 @@ export class Grass {
                  float x_p = vPosition.x / 10.0 + 0.5;
                  float z_p = vPosition.z / 10.0 + 0.5;
                  float height_value = texture2D(uGrassHeight, vec2(x_p, z_p)).r;
-                 vPosition.y -= 0.2;
-                 vPosition.y += height_value * 0.2;
+                 vPosition.y -= 0.175;
+                 vPosition.y += height_value * 0.175;
                  vPosition.z += sin(vPosition.y * (normal.z) * (uTime * 10.0)) * 0.05 ;
                  gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
                 `
             );
 
             shader.vertexShader = vertex;
-            console.log(shader.vertexShader);
         };
 
         return mesh;
     }
 
+    private mowGrass = () => {
+        this.mover.visible = this.moverEnabled;
+        if (!this.moverEnabled) {
+            return;
+        }
+
+        const { ctx, resolution } = this.grassHeightCanvas;
+        const { x, z } = GlobalStore.cameraTarget;
+
+        const canvas_x = ((x + 5) / 5) * (resolution / 2);
+        const canvas_y = ((z + 5) / 5) * (resolution / 2);
+        const radius = (this.mover.scale.x / 15) * resolution;
+        ctx.save();
+        ctx.fillStyle = 'black';
+        ctx.beginPath();
+        ctx.arc(canvas_x, canvas_y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        this.grassHeightTexture.needsUpdate = true;
+    };
+
     getMesh() {
-        return this.mesh;
+        return this.group;
     }
 }

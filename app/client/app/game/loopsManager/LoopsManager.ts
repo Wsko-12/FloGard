@@ -1,6 +1,6 @@
 import Loop, { TLoopCallback } from './loop/Loop';
 
-export type TGameLoopName = 'render' | 'update' | 'tick';
+export type TGameLoopName = 'render' | 'update' | 'tick' | 'userActions';
 
 export default class LoopsManager {
     private static loops: Record<TGameLoopName, Loop> | null = null;
@@ -13,6 +13,7 @@ export default class LoopsManager {
             render: new Loop(60),
             update: new Loop(45),
             tick: new Loop(50),
+            userActions: new Loop(5),
         };
         this.setDevFunctions();
     }

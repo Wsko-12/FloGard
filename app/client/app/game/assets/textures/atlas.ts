@@ -13,7 +13,7 @@ const textureAtlas: AtlasItem[] = [
     },
     {
         name: 'grass',
-        folder: '',
+        folder: 'grass/',
         file: 'grass.png',
     },
     {
@@ -22,9 +22,9 @@ const textureAtlas: AtlasItem[] = [
         file: 'stars.png',
     },
     {
-        name: 'grassHeight',
-        folder: '',
-        file: 'grassHeight.png',
+        name: 'grassMover',
+        folder: 'grass/',
+        file: 'grassMover.png',
     },
 ];
 
