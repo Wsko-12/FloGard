@@ -2,7 +2,6 @@ import { DoubleSide, Mesh, MeshPhongMaterial } from 'three';
 import { Point2 } from '../../../../../utils/Geometry';
 import Random from '../../../../../utils/random';
 import Assets from '../../../../assets/Assets';
-import World from '../../../World';
 import { GROUND_SIZE } from '../../ground/Ground';
 import { EWeeds, WEED_CONFIG } from './config';
 
@@ -51,7 +50,7 @@ export default class Weed {
         this.position = new Point2(x, z);
 
         this.seed = seed;
-        this.random = new Random(seed);
+        this.random = new Random(seed * 10000);
         const type = getWeedRandomType(this.random.get());
         const number = getWeedRandomNumberByType(this.random.get(), type);
 
@@ -64,10 +63,12 @@ export default class Weed {
         const material = WeedsMaterials[type];
 
         this.mesh = new Mesh(geometry, material);
-        const rotation = Math.PI * 2 * this.random.get();
+        const rotation = Math.PI * 4 * this.random.get();
 
         this.mesh.position.set(x, 0, z);
         this.mesh.rotation.set(0, rotation, 0);
+        this.mesh.castShadow = true;
+        this.mesh.receiveShadow = true;
     }
 
     public getSeed() {

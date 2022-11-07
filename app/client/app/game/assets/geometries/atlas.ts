@@ -42,6 +42,21 @@ const geometriesAtlas: AtlasItem[] = [
         folder: 'grass/weeds/dandelion/',
         file: 'dandelion_6.glb',
     },
+    {
+        name: 'urtica_1',
+        folder: 'grass/weeds/urtica/',
+        file: 'urtica_1.glb',
+    },
+    {
+        name: 'urtica_2',
+        folder: 'grass/weeds/urtica/',
+        file: 'urtica_2.glb',
+    },
+    {
+        name: 'arctium_1',
+        folder: 'grass/weeds/arctium/',
+        file: 'arctium_1.glb',
+    },
 ];
 
 export { geometriesAtlas };
