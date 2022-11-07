@@ -1,5 +1,6 @@
 import {
     BufferGeometry,
+    CanvasTexture,
     DoubleSide,
     Mesh,
     MeshDepthMaterial,
@@ -13,6 +14,7 @@ import {
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import Assets from '../../../assets/Assets';
 import LoopsManager from '../../../loopsManager/LoopsManager';
+import { FULL_DAY_TIME } from '../../day/Day';
 
 export class Grass {
     private mesh: Mesh;
@@ -25,16 +27,47 @@ export class Grass {
         },
     };
 
+    private grassHeightCanvas: {
+        ctx: CanvasRenderingContext2D;
+        canvas: HTMLCanvasElement;
+        resolution: number;
+    };
+    private grassHeightTexture: CanvasTexture;
+
     constructor() {
+        LoopsManager.subscribe('update', this.update);
+
+        this.grassHeightCanvas = this.createСanvas();
+        this.grassHeightTexture = new CanvasTexture(this.grassHeightCanvas.canvas);
+        this.grassHeightTexture.flipY = false;
         this.mesh = this.createMesh();
         this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
-        LoopsManager.subscribe('update', this.update);
-        // this.mesh.position.y = -0.2;
+    }
+
+    private createСanvas() {
+        const resolution = 1024;
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = resolution;
+        const ctx = canvas.getContext('2d')!;
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, resolution, resolution);
+
+        return { canvas, ctx, resolution };
     }
 
     private update = (time: number) => {
         this.uniforms.uTime.value = time;
+        this.grow(time);
+    };
+
+    private grow = (time: number) => {
+        if (time % 10 === 0) {
+            const { ctx, resolution } = this.grassHeightCanvas;
+            ctx.fillStyle = 'rgba(255,255,255,0.01)';
+            ctx.fillRect(0, 0, resolution, resolution);
+            this.grassHeightTexture.needsUpdate = true;
+        }
     };
 
     private createMesh() {
@@ -49,9 +82,7 @@ export class Grass {
             side: DoubleSide,
         });
 
-        const grassHeightTexture = Assets.getTexture('grassHeight');
-        grassHeightTexture.wrapS = RepeatWrapping;
-        grassHeightTexture.wrapT = RepeatWrapping;
+        const grassHeightTexture = this.grassHeightTexture;
         this.uniforms.uGrassHeight = new Uniform(grassHeightTexture);
 
         material.onBeforeCompile = (shader) => {
