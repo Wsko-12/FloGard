@@ -1,8 +1,10 @@
-import { DoubleSide, Mesh, MeshPhongMaterial } from 'three';
+import { DoubleSide, Mesh, MeshDepthMaterial, MeshPhongMaterial, RGBADepthPacking } from 'three';
 import { Point2 } from '../../../../../utils/Geometry';
 import Random from '../../../../../utils/random';
 import Assets from '../../../../assets/Assets';
+import LoopsManager from '../../../../loopsManager/LoopsManager';
 import { GROUND_SIZE } from '../../ground/Ground';
+import { UNIFORM_WIND_STRENGTH } from '../Grass';
 import { EWeeds, WEED_CONFIG } from './config';
 
 const getWeedRandomType = (random: number) => {
@@ -17,21 +19,88 @@ const getWeedRandomNumberByType = (random: number, type: EWeeds) => {
     return index;
 };
 
-let WeedsMaterials: Record<string, MeshPhongMaterial> | null = null;
+let WeedsMaterials: Record<string, { base: MeshPhongMaterial; depth: MeshDepthMaterial }> | null = null;
 
 export default class Weed {
     static initMaterialsAtlas() {
-        const atlas: Record<string, MeshPhongMaterial> = {};
+        const uniforms = {
+            uTime: {
+                value: 0,
+            },
+        };
+
+        LoopsManager.subscribe('update', (time) => {
+            uniforms.uTime.value = time;
+        });
+
+        const atlas: Record<string, { base: MeshPhongMaterial; depth: MeshDepthMaterial }> = {};
         Object.keys(WEED_CONFIG).forEach((weedType) => {
             const texture = Assets.getTexture(weedType);
-            const material = new MeshPhongMaterial({
+            const base = new MeshPhongMaterial({
                 map: texture,
                 side: DoubleSide,
                 alphaTest: 0.1,
                 alphaMap: texture,
             });
 
-            atlas[weedType] = material;
+            base.onBeforeCompile = (shader) => {
+                shader.uniforms.uTime = uniforms.uTime;
+                shader.uniforms.uWindStrength = UNIFORM_WIND_STRENGTH;
+
+                let vertex = shader.vertexShader;
+                vertex = vertex.replace(
+                    '#include <common>',
+                    `#include <common>
+                     uniform float uWindStrength;
+                     uniform float uTime;
+                    `
+                );
+
+                vertex = vertex.replace(
+                    '#include <fog_vertex>',
+                    `#include <fog_vertex>
+                     vec3 vPosition = position;
+                     vPosition.z += sin(vPosition.y * (uTime * uWindStrength)) * 0.04 ;
+                     gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
+                    `
+                );
+                shader.vertexShader = vertex;
+            };
+
+            const depth = new MeshDepthMaterial({
+                depthPacking: RGBADepthPacking,
+                map: texture,
+                alphaTest: 0.5,
+            });
+            depth.onBeforeCompile = (shader) => {
+                shader.uniforms.uTime = uniforms.uTime;
+                shader.uniforms.uWindStrength = UNIFORM_WIND_STRENGTH;
+
+                let vertex = shader.vertexShader;
+                vertex = vertex.replace(
+                    '#include <common>',
+                    `#include <common>
+                     uniform float uWindStrength;
+                     uniform float uTime;
+                     uniform sampler2D uGrassHeight;
+                    `
+                );
+                vertex = vertex.replace(
+                    '#include <clipping_planes_vertex>',
+                    `#include <clipping_planes_vertex>
+                     vec3 vPosition = position;
+                     float x_p = vPosition.x / 10.0 + 0.5;
+                     float z_p = vPosition.z / 10.0 + 0.5;
+                     float height_value = texture2D(uGrassHeight, vec2(x_p, z_p)).r;
+                     vPosition.y -= 0.175;
+                     vPosition.y += height_value * 0.175;
+                     vPosition.z += sin(vPosition.y * (normal.z) * (uTime * uWindStrength)) * 0.05 ;
+                     gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
+                    `
+                );
+                shader.vertexShader = vertex;
+            };
+            atlas[weedType] = { base, depth };
         });
 
         return atlas;
@@ -60,9 +129,10 @@ export default class Weed {
             WeedsMaterials = Weed.initMaterialsAtlas();
         }
 
-        const material = WeedsMaterials[type];
+        const materials = WeedsMaterials[type];
 
-        this.mesh = new Mesh(geometry, material);
+        this.mesh = new Mesh(geometry, materials.base);
+        this.mesh.customDepthMaterial = materials.depth;
         const rotation = Math.PI * 4 * this.random.get();
 
         this.mesh.position.set(x, 0, z);

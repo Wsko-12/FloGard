@@ -7,5 +7,5 @@ export enum EWeeds {
 export const WEED_CONFIG: Record<EWeeds, number> = {
     dandelion: 6,
     urtica: 2,
-    arctium: 1,
+    arctium: 2,
 };

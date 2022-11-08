@@ -21,6 +21,10 @@ import Day, { FULL_DAY_TIME } from '../../day/Day';
 import { GROUND_SIZE } from '../ground/Ground';
 import Weed from './weed/Weed';
 
+export const UNIFORM_WIND_STRENGTH = {
+    value: 1,
+};
+
 export class Grass {
     private group: Group;
     private mover: Mesh;
@@ -89,6 +93,9 @@ export class Grass {
 
         const { x, z } = GlobalStore.cameraTarget;
         this.mover.position.set(x, 0.01, z);
+
+        const power = Math.abs(Math.sin(time / 10)) * 10;
+        UNIFORM_WIND_STRENGTH.value = power;
     };
 
     private dayUpdate = (time: number) => {
@@ -155,11 +162,13 @@ export class Grass {
         material.onBeforeCompile = (shader) => {
             shader.uniforms.uTime = this.uniforms.uTime;
             shader.uniforms.uGrassHeight = this.uniforms.uGrassHeight;
+            shader.uniforms.uWindStrength = UNIFORM_WIND_STRENGTH;
             let vertex = shader.vertexShader;
             vertex = vertex.replace(
                 '#include <common>',
                 `#include <common>
                  uniform float uTime;
+                 uniform float uWindStrength;
                  uniform sampler2D uGrassHeight;
                 `
             );
@@ -173,7 +182,7 @@ export class Grass {
                  float height_value = texture2D(uGrassHeight, vec2(x_p, z_p)).r;
                  vPosition.y -= 0.175;
                  vPosition.y += height_value * 0.175;
-                 vPosition.z += sin(vPosition.y * (normal.z) * (uTime * 10.0)) * 0.05 ;
+                 vPosition.z += sin(vPosition.y * (normal.z) * (uTime * uWindStrength)) * 0.05 ;
                  gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
                 `
             );
@@ -210,11 +219,13 @@ export class Grass {
         depthMaterial.onBeforeCompile = (shader) => {
             shader.uniforms.uTime = this.uniforms.uTime;
             shader.uniforms.uGrassHeight = this.uniforms.uGrassHeight;
+            shader.uniforms.uWindStrength = UNIFORM_WIND_STRENGTH;
             let vertex = shader.vertexShader;
 
             vertex = vertex.replace(
                 '#include <common>',
                 `#include <common>
+                 uniform float uWindStrength;
                  uniform float uTime;
                  uniform sampler2D uGrassHeight;
                 `
@@ -229,7 +240,7 @@ export class Grass {
                  float height_value = texture2D(uGrassHeight, vec2(x_p, z_p)).r;
                  vPosition.y -= 0.175;
                  vPosition.y += height_value * 0.175;
-                 vPosition.z += sin(vPosition.y * (normal.z) * (uTime * 10.0)) * 0.05 ;
+                 vPosition.z += sin(vPosition.y * (normal.z) * (uTime * uWindStrength)) * 0.05 ;
                  gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
                 `
             );
