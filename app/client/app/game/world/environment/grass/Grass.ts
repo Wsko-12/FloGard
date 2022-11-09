@@ -27,7 +27,7 @@ export const UNIFORM_WIND_STRENGTH = {
 };
 
 export const UNIFORM_WIND_DIRECTION = {
-    value: new Vector2(1, 0.5),
+    value: new Vector2(1, 0),
 };
 
 export class Grass {
@@ -147,7 +147,7 @@ export class Grass {
 
         const strength = Math.abs(Math.sin(time * 0.1));
         console.log(strength);
-        UNIFORM_WIND_STRENGTH.value = strength;
+        UNIFORM_WIND_STRENGTH.value = 1;
     };
 
     private createMesh() {
@@ -201,7 +201,7 @@ export class Grass {
                  //wind small hesitation
                  float hesitation = sin(uTime * 10.0 + normal.z + normal.x) * uWindStrength;
                  float windBias =  hesitation * max(position.y, 0.0) * windBiasValue;
-                 windBias += hesitation * windBiasValue * 0.01;
+                //  windBias += hesitation * windBiasValue * 0.01;
                  vPosition.x += windBias * normal.x;
                  vPosition.z += windBias * normal.z;
 
@@ -284,12 +284,13 @@ export class Grass {
                 vPosition.y += heightBias;
 
                 // wind
-                float windBiasValue = 0.2;
+                float windBiasValue = 0.1;
+
 
                 //wind small hesitation
                 float hesitation = sin(uTime * 10.0 + normal.z + normal.x) * uWindStrength;
                 float windBias =  hesitation * max(position.y, 0.0) * windBiasValue;
-                windBias += hesitation * windBiasValue * 0.01;
+                // windBias += hesitation * windBiasValue * 0.01;
                 vPosition.x += windBias * normal.x;
                 vPosition.z += windBias * normal.z;
 
