@@ -201,7 +201,7 @@ export class Grass {
                  //wind small hesitation
                  float hesitation = sin(uTime * 10.0 + normal.z + normal.x) * uWindStrength;
                  float windBias =  hesitation * max(position.y, 0.0) * windBiasValue;
-                 windBias += hesitation * windBiasValue * 0.01;
+                //  windBias += hesitation * windBiasValue * 0.01;
                  vPosition.x += windBias * normal.x;
                  vPosition.z += windBias * normal.z;
 
