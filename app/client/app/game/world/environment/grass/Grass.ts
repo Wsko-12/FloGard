@@ -146,8 +146,8 @@ export class Grass {
         this.mover.position.set(x, 0.01, z);
 
         const strength = Math.abs(Math.sin(time * 0.1));
-        // console.log(strength);
-        UNIFORM_WIND_STRENGTH.value = 1;
+        console.log(strength);
+        UNIFORM_WIND_STRENGTH.value = strength;
     };
 
     private createMesh() {
@@ -196,7 +196,7 @@ export class Grass {
 
 
                  // wind
-                 float windBiasValue = 0.2;
+                 float windBiasValue = 0.1;
 
                  //wind small hesitation
                  float hesitation = sin(uTime * 10.0 + normal.z + normal.x) * uWindStrength;

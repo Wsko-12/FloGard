@@ -3,18 +3,22 @@ import LoopsManager from '../../loopsManager/LoopsManager';
 export type TDayCallback = (gameTime: number) => void;
 
 export const FULL_DAY_TIME = 1440;
-
+// TODO: add dev functions with freeze and setTime;
 export default class Day {
     static time = 600;
     static fullDay = FULL_DAY_TIME;
     static subscribers: TDayCallback[] = [];
+    private static freezed = true;
     static init() {
         LoopsManager.subscribe('tick', this.update);
     }
 
     static update = () => {
-        this.time += 1;
-        this.time = this.time % this.fullDay;
+        if (!this.freezed) {
+            this.time += 1;
+            this.time = this.time % this.fullDay;
+        }
+
         this.callSubscribers();
     };
 

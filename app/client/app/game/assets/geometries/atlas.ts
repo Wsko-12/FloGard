@@ -57,6 +57,11 @@ const geometriesAtlas: AtlasItem[] = [
         folder: 'grass/weeds/arctium/',
         file: 'arctium_1.glb',
     },
+    {
+        name: 'arctium_2',
+        folder: 'grass/weeds/arctium/',
+        file: 'arctium_2.glb',
+    },
 ];
 
 export { geometriesAtlas };
