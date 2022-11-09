@@ -11,6 +11,7 @@ import {
     PlaneGeometry,
     RGBADepthPacking,
     Uniform,
+    Vector2,
 } from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { Point2 } from '../../../../utils/Geometry';
@@ -23,6 +24,10 @@ import Weed from './weed/Weed';
 
 export const UNIFORM_WIND_STRENGTH = {
     value: 1,
+};
+
+export const UNIFORM_WIND_DIRECTION = {
+    value: new Vector2(1, 0.5),
 };
 
 export class Grass {
@@ -94,8 +99,9 @@ export class Grass {
         const { x, z } = GlobalStore.cameraTarget;
         this.mover.position.set(x, 0.01, z);
 
-        const power = Math.abs(Math.sin(time / 10)) * 10;
-        UNIFORM_WIND_STRENGTH.value = power;
+        const strength = Math.abs(Math.sin(time * 0.1));
+        console.log(strength);
+        UNIFORM_WIND_STRENGTH.value = strength;
     };
 
     private dayUpdate = (time: number) => {
@@ -163,12 +169,14 @@ export class Grass {
             shader.uniforms.uTime = this.uniforms.uTime;
             shader.uniforms.uGrassHeight = this.uniforms.uGrassHeight;
             shader.uniforms.uWindStrength = UNIFORM_WIND_STRENGTH;
+            shader.uniforms.uWindDirection = UNIFORM_WIND_DIRECTION;
             let vertex = shader.vertexShader;
             vertex = vertex.replace(
                 '#include <common>',
                 `#include <common>
                  uniform float uTime;
                  uniform float uWindStrength;
+                 uniform vec2 uWindDirection;
                  uniform sampler2D uGrassHeight;
                 `
             );
@@ -176,13 +184,40 @@ export class Grass {
             vertex = vertex.replace(
                 '#include <fog_vertex>',
                 `#include <fog_vertex>
+
                  vec3 vPosition = position;
-                 float x_p = vPosition.x / 10.0 + 0.5;
-                 float z_p = vPosition.z / 10.0 + 0.5;
+
+                 // height
+                 float x_p = position.x / 10.0 + 0.5;
+                 float z_p = position.z / 10.0 + 0.5;
                  float height_value = texture2D(uGrassHeight, vec2(x_p, z_p)).r;
-                 vPosition.y -= 0.175;
-                 vPosition.y += height_value * 0.175;
-                 vPosition.z += sin(vPosition.y * (normal.z) * (uTime * uWindStrength)) * 0.05 ;
+                 float heightBias = height_value * 0.175 - 0.175;
+                 vPosition.y += heightBias;
+
+
+                 // wind
+                 float windBiasValue = 0.2;
+
+                 //wind small hesitation
+                 float hesitation = sin(uTime * 10.0 + normal.z + normal.x) * uWindStrength;
+                 float windBias =  hesitation * max(position.y, 0.0) * windBiasValue;
+                 windBias += hesitation * windBiasValue * 0.01;
+                 vPosition.x += windBias * normal.x;
+                 vPosition.z += windBias * normal.z;
+
+
+                 // wind waves
+                float xPosValue = max(sin(uTime + position.x * 0.5), 0.0);
+                float zPosValue = max(sin(uTime + position.z * 0.5), 0.0);
+
+                // here use position with height
+                vPosition.x += xPosValue * (-uWindDirection.x * uWindStrength * 0.75) * vPosition.y;
+                // vPosition.z += zPosValue * (-uWindDirection.x * uWindStrength * 0.75) * vPosition.y;
+                vPosition.y -= (xPosValue + zPosValue) * vPosition.y * 0.45 * uWindStrength;
+
+                // vPosition.y += max(sin(uTime + position.x * 0.5), 0.0);
+        
+
                  gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
                 `
             );
@@ -220,28 +255,54 @@ export class Grass {
             shader.uniforms.uTime = this.uniforms.uTime;
             shader.uniforms.uGrassHeight = this.uniforms.uGrassHeight;
             shader.uniforms.uWindStrength = UNIFORM_WIND_STRENGTH;
+            shader.uniforms.uWindDirection = UNIFORM_WIND_DIRECTION;
+
             let vertex = shader.vertexShader;
 
             vertex = vertex.replace(
                 '#include <common>',
                 `#include <common>
-                 uniform float uWindStrength;
-                 uniform float uTime;
-                 uniform sampler2D uGrassHeight;
+                uniform float uTime;
+                uniform float uWindStrength;
+                uniform vec2 uWindDirection;
+                uniform sampler2D uGrassHeight;
                 `
             );
 
             vertex = vertex.replace(
                 '#include <clipping_planes_vertex>',
                 `#include <clipping_planes_vertex>
-                 vec3 vPosition = position;
-                 float x_p = vPosition.x / 10.0 + 0.5;
-                 float z_p = vPosition.z / 10.0 + 0.5;
-                 float height_value = texture2D(uGrassHeight, vec2(x_p, z_p)).r;
-                 vPosition.y -= 0.175;
-                 vPosition.y += height_value * 0.175;
-                 vPosition.z += sin(vPosition.y * (normal.z) * (uTime * uWindStrength)) * 0.05 ;
-                 gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
+                vec3 vPosition = position;
+
+                // height
+                float x_p = position.x / 10.0 + 0.5;
+                float z_p = position.z / 10.0 + 0.5;
+                float height_value = texture2D(uGrassHeight, vec2(x_p, z_p)).r;
+                float heightBias = height_value * 0.175 - 0.175;
+                vPosition.y += heightBias;
+
+                // wind
+                float windBiasValue = 0.2;
+
+                //wind small hesitation
+                float hesitation = sin(uTime * 10.0 + normal.z + normal.x) * uWindStrength;
+                float windBias =  hesitation * max(position.y, 0.0) * windBiasValue;
+                windBias += hesitation * windBiasValue * 0.01;
+                vPosition.x += windBias * normal.x;
+                vPosition.z += windBias * normal.z;
+
+
+                // wind waves
+               float xPosValue = max(sin(uTime + position.x * 0.5), 0.0);
+               float zPosValue = max(sin(uTime + position.z * 0.5), 0.0);
+
+               // here use position with height
+               vPosition.x += xPosValue * (-uWindDirection.x * uWindStrength * 0.75) * vPosition.y;
+               // vPosition.z += zPosValue * (-uWindDirection.x * uWindStrength * 0.75) * vPosition.y;
+               vPosition.y -= (xPosValue + zPosValue) * vPosition.y * 0.45 * uWindStrength;
+
+               gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
+
                 `
             );
 

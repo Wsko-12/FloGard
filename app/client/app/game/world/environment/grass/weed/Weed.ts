@@ -60,7 +60,6 @@ export default class Weed {
                     '#include <fog_vertex>',
                     `#include <fog_vertex>
                      vec3 vPosition = position;
-                     vPosition.z += sin(vPosition.y * (uTime * uWindStrength)) * 0.04 ;
                      gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
                     `
                 );
@@ -89,11 +88,6 @@ export default class Weed {
                     '#include <clipping_planes_vertex>',
                     `#include <clipping_planes_vertex>
                      vec3 vPosition = position;
-                     float x_p = vPosition.x / 10.0 + 0.5;
-                     float z_p = vPosition.z / 10.0 + 0.5;
-                     float height_value = texture2D(uGrassHeight, vec2(x_p, z_p)).r;
-                     vPosition.y -= 0.175;
-                     vPosition.y += height_value * 0.175;
                      vPosition.z += sin(vPosition.y * (normal.z) * (uTime * uWindStrength)) * 0.05 ;
                      gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
                     `

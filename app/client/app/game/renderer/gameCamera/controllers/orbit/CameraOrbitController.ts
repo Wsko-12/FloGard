@@ -11,7 +11,7 @@ export default class OrbitController extends CameraController {
 
     public cameraAngles = {
         alpha: Math.PI / 4,
-        tetha: Math.PI / 4,
+        tetha: 0,
 
         deltaAlpha: 0,
         deltaTetha: 0,
@@ -21,7 +21,7 @@ export default class OrbitController extends CameraController {
         },
     };
     public zoom = {
-        value: 9,
+        value: 8,
         max: 10,
         min: 0.5,
         delta: 0,

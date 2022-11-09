@@ -15,7 +15,7 @@ export default class GameCamera {
         const camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 50);
         this.camera = camera;
 
-        this.position = new Point3(10, 0, 0);
+        this.position = new Point3(0, 0, 0);
         this.target = new Point3(0, 0, 0);
 
         this.controller = new CameraOrbitController(mouseEventsHandler, this.position, this.target, this.camera);
