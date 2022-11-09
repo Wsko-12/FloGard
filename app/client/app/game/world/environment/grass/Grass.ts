@@ -20,15 +20,8 @@ import { GlobalStore } from '../../../globalStore/GlobalStore';
 import LoopsManager from '../../../loopsManager/LoopsManager';
 import Day, { FULL_DAY_TIME } from '../../day/Day';
 import { GROUND_SIZE } from '../ground/Ground';
+import Weather from '../weather/Weather';
 import Weed from './weed/Weed';
-
-export const UNIFORM_WIND_STRENGTH = {
-    value: 1,
-};
-
-export const UNIFORM_WIND_DIRECTION = {
-    value: new Vector2(1, 0),
-};
 
 export class Grass {
     private group: Group;
@@ -144,10 +137,6 @@ export class Grass {
 
         const { x, z } = GlobalStore.cameraTarget;
         this.mover.position.set(x, 0.01, z);
-
-        const strength = Math.abs(Math.sin(time * 0.1));
-        console.log(strength);
-        UNIFORM_WIND_STRENGTH.value = 1;
     };
 
     private createMesh() {
@@ -168,8 +157,8 @@ export class Grass {
         material.onBeforeCompile = (shader) => {
             shader.uniforms.uTime = this.uniforms.uTime;
             shader.uniforms.uGrassHeight = this.uniforms.uGrassHeight;
-            shader.uniforms.uWindStrength = UNIFORM_WIND_STRENGTH;
-            shader.uniforms.uWindDirection = UNIFORM_WIND_DIRECTION;
+            shader.uniforms.uWindStrength = Weather.windUniforms.uWindStrength;
+            shader.uniforms.uWindDirection = Weather.windUniforms.uWindDirection;
             let vertex = shader.vertexShader;
             vertex = vertex.replace(
                 '#include <common>',
@@ -256,8 +245,8 @@ export class Grass {
         depthMaterial.onBeforeCompile = (shader) => {
             shader.uniforms.uTime = this.uniforms.uTime;
             shader.uniforms.uGrassHeight = this.uniforms.uGrassHeight;
-            shader.uniforms.uWindStrength = UNIFORM_WIND_STRENGTH;
-            shader.uniforms.uWindDirection = UNIFORM_WIND_DIRECTION;
+            shader.uniforms.uWindStrength = Weather.windUniforms.uWindStrength;
+            shader.uniforms.uWindDirection = Weather.windUniforms.uWindDirection;
 
             let vertex = shader.vertexShader;
 

@@ -8,7 +8,7 @@ export default class Day {
     static time = 600;
     static fullDay = FULL_DAY_TIME;
     static subscribers: TDayCallback[] = [];
-    private static freezed = true;
+    private static freezed = false;
     static init() {
         LoopsManager.subscribe('tick', this.update);
     }

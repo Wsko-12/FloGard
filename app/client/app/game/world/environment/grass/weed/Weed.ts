@@ -4,7 +4,7 @@ import Random from '../../../../../utils/random';
 import Assets from '../../../../assets/Assets';
 import LoopsManager from '../../../../loopsManager/LoopsManager';
 import { GROUND_SIZE } from '../../ground/Ground';
-import { UNIFORM_WIND_DIRECTION, UNIFORM_WIND_STRENGTH } from '../Grass';
+import Weather from '../../weather/Weather';
 import { EWeeds, WEED_CONFIG } from './config';
 
 const getWeedRandomType = (random: number) => {
@@ -45,8 +45,8 @@ export default class Weed {
 
             base.onBeforeCompile = (shader) => {
                 shader.uniforms.uTime = uniforms.uTime;
-                shader.uniforms.uWindStrength = UNIFORM_WIND_STRENGTH;
-                shader.uniforms.uWindDirection = UNIFORM_WIND_DIRECTION;
+                shader.uniforms.uWindStrength = Weather.windUniforms.uWindStrength;
+                shader.uniforms.uWindDirection = Weather.windUniforms.uWindDirection;
 
                 let vertex = shader.vertexShader;
                 vertex = vertex.replace(
@@ -96,8 +96,8 @@ export default class Weed {
             });
             depth.onBeforeCompile = (shader) => {
                 shader.uniforms.uTime = uniforms.uTime;
-                shader.uniforms.uWindStrength = UNIFORM_WIND_STRENGTH;
-                shader.uniforms.uWindDirection = UNIFORM_WIND_DIRECTION;
+                shader.uniforms.uWindStrength = Weather.windUniforms.uWindStrength;
+                shader.uniforms.uWindDirection = Weather.windUniforms.uWindDirection;
 
                 let vertex = shader.vertexShader;
                 vertex = vertex.replace(
