@@ -93,17 +93,6 @@ export class Grass {
         return { canvas, ctx, resolution };
     }
 
-    private update = (time: number) => {
-        this.uniforms.uTime.value = time;
-
-        const { x, z } = GlobalStore.cameraTarget;
-        this.mover.position.set(x, 0.01, z);
-
-        const strength = Math.abs(Math.sin(time * 0.1));
-        console.log(strength);
-        UNIFORM_WIND_STRENGTH.value = strength;
-    };
-
     private dayUpdate = (time: number) => {
         this.grow(time);
         if (time === FULL_DAY_TIME - 1) {
@@ -149,6 +138,17 @@ export class Grass {
             return !isRemove;
         });
     }
+
+    private update = (time: number) => {
+        this.uniforms.uTime.value = time;
+
+        const { x, z } = GlobalStore.cameraTarget;
+        this.mover.position.set(x, 0.01, z);
+
+        const strength = Math.abs(Math.sin(time * 0.1));
+        // console.log(strength);
+        UNIFORM_WIND_STRENGTH.value = 1;
+    };
 
     private createMesh() {
         const grassGeometry = Assets.getGeometry('grass');
@@ -212,9 +212,11 @@ export class Grass {
 
                 // here use position with height
                 vPosition.x += xPosValue * (-uWindDirection.x * uWindStrength * 0.75) * vPosition.y;
-                // vPosition.z += zPosValue * (-uWindDirection.x * uWindStrength * 0.75) * vPosition.y;
+                vPosition.z += zPosValue * (-uWindDirection.y * uWindStrength * 0.75) * vPosition.y;
                 vPosition.y -= (xPosValue + zPosValue) * vPosition.y * 0.45 * uWindStrength;
 
+
+                // test wave
                 // vPosition.y += max(sin(uTime + position.x * 0.5), 0.0);
         
 
@@ -298,7 +300,7 @@ export class Grass {
 
                // here use position with height
                vPosition.x += xPosValue * (-uWindDirection.x * uWindStrength * 0.75) * vPosition.y;
-               // vPosition.z += zPosValue * (-uWindDirection.x * uWindStrength * 0.75) * vPosition.y;
+               vPosition.z += zPosValue * (-uWindDirection.y * uWindStrength * 0.75) * vPosition.y;
                vPosition.y -= (xPosValue + zPosValue) * vPosition.y * 0.45 * uWindStrength;
 
                gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
