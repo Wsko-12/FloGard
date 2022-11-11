@@ -91,7 +91,7 @@ export default class CartoonOutline implements Pass {
 
                     float outline_mask = (max(depth_round_average, 0.6) - 0.6) * 2.5;
                     float draw_outline = mix(0.0, full_outline, outline_mask);
-                    gl_FragColor = vec4(mix(texture.rgb,outlineColor, draw_outline),1.0);
+                    gl_FragColor = vec4(mix(texture.rgb, texture.rgb * 0.75, draw_outline),1.0);
 
                 }`,
         });

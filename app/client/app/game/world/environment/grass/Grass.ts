@@ -23,7 +23,7 @@ import { GROUND_SIZE } from '../ground/Ground';
 import Weed from './weed/Weed';
 
 export const UNIFORM_WIND_STRENGTH = {
-    value: 1,
+    value: 0.5,
 };
 
 export const UNIFORM_WIND_DIRECTION = {
@@ -147,7 +147,7 @@ export class Grass {
 
         const strength = Math.abs(Math.sin(time * 0.1));
         console.log(strength);
-        UNIFORM_WIND_STRENGTH.value = 1;
+        UNIFORM_WIND_STRENGTH.value = strength;
     };
 
     private createMesh() {
